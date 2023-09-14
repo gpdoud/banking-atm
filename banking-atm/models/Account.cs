@@ -29,4 +29,7 @@ public class Account {
 
     public virtual IEnumerable<Transaction>? Transactions { get; set; } = null;
 
+    public override string ToString() {
+        return $"| {Id,3} | {Type,4} | {Description,-30} | {Balance,10:N2} |";
+    }
 }
