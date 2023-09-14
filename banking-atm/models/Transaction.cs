@@ -27,4 +27,7 @@ public class Transaction {
     [JsonIgnore]
     public virtual Account? Account { get; set; } = null;
 
+    public override string ToString() {
+        return $"{CreatedDate:d}|{Id,3:N0}|{Description,-30}|{TransactionType}|";
+    }
 }

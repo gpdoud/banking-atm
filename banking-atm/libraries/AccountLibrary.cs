@@ -15,22 +15,41 @@ public class AccountLibrary : BaseLibrary {
 
     private static string AccountUrl = $"{URL}/api/accounts";
 
-    public async Task<IEnumerable<Account>> GetAccounts() {
-        var req = new HttpRequestMessage(HttpMethod.Get, $"{AccountUrl}");
+    public async Task<IEnumerable<Account>> GetAccountsForCustomer(int id) {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"{AccountUrl}/accounts/{id}");
         HttpResponseMessage res = await http.SendAsync(req);
         var json = await res.Content.ReadAsStringAsync();
         var accts = JsonSerializer.Deserialize(json, typeof(IEnumerable<Account>), options) as IEnumerable<Account>;
-        return accts;
+        return accts!;
     }
 
     public async Task Deposit(decimal amount, Account account) {
         account.Balance += amount;
+        await PutAccount(account);
+    }
+    public async Task Withdraw(decimal amount, Account account) {
+        account.Balance -= amount;
+        await PutAccount(account);
+    }
+    public async Task AddAccount(Account account) {
+        await PostAccount(account);
+    }
+    private async Task PostAccount(Account account) {
+        var req = new HttpRequestMessage(HttpMethod.Post, $"{AccountUrl}");
+        var json = JsonSerializer.Serialize<Account>(account, options);
+        req.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var res = await http.SendAsync(req);
+        if(res.StatusCode == System.Net.HttpStatusCode.Created)
+            return;
+        throw new Exception($"Post failed. StatusCode is {res.StatusCode}..");
+    }
+    private async Task PutAccount(Account account) {
         var req = new HttpRequestMessage(HttpMethod.Put, $"{AccountUrl}/{account.Id}");
         var json = JsonSerializer.Serialize<Account>(account, options);
         req.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var res = await http.SendAsync(req);
         if(res.StatusCode == System.Net.HttpStatusCode.NoContent)
             return;
-        throw new Exception($"Deposit of {amount:C} failed. StatusCode is {res.StatusCode}..");
+        throw new Exception($"Put failed. StatusCode is {res.StatusCode}..");
     }
 }
