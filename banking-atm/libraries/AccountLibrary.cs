@@ -52,4 +52,11 @@ public class AccountLibrary : BaseLibrary {
             return;
         throw new Exception($"Put failed. StatusCode is {res.StatusCode}..");
     }
+    public async Task DeleteAccount(int id) {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"{AccountUrl}/{id}");
+        var res = await http.SendAsync(req);
+        if(res.StatusCode == System.Net.HttpStatusCode.NoContent)
+            return;
+        throw new Exception($"Delete failed. StatusCode is {res.StatusCode}..");
+    }
 }

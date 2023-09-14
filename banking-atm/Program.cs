@@ -37,6 +37,7 @@ while(true) {
             break;
         case "c":
             cli.PromptLine("\nClose Account");
+            await CloseAccount();
             break;
         case "d": 
             cli.PromptLine("\nDeposit");
@@ -58,6 +59,18 @@ while(true) {
 }
 
 /******************************************************/
+async Task CloseAccount() {
+    var account = await SelectAccount();
+    Console.WriteLine($"Balance is {account.Balance:C}");
+    var holdBalance = account.Balance;
+    await acctlib.DeleteAccount(account.Id);
+    if(holdBalance == 0) return;
+    Console.WriteLine("Select account to deposit balance.");
+    var account2 = await SelectAccount();
+    await acctlib.Deposit(holdBalance, account2);
+    cli.PromptLine($"Deposited {holdBalance:C} into {account2.Description}.");
+    await translib.Log("D", account2.Id, $"Deposited {holdBalance:c}");
+}
 async Task AddAccount() {
 
     var newAcct = new Account();
