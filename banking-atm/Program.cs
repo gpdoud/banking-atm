@@ -53,6 +53,8 @@ while(true) {
         case "x": 
             cli.PromptLine("\nQuit");  
             return;
+        default:
+            break;
     }
 
 }
